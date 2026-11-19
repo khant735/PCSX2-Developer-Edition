@@ -1,0 +1,51 @@
+name: PCSX2 Developer Edition Windows x64 (LLVM-MinGW)
+on:
+  workflow_dispatch:
+    inputs:
+      source_mode:
+        description: 'snapshot uses frozen Batch 25 source; repository requires committed Batch 25 modifications'
+        type: choice
+        required: true
+        default: snapshot
+        options: [snapshot, repository]
+permissions:
+  contents: read
+jobs:
+  windows-x64:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Check environment backup release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view build-environment-batch25 --repo "$GITHUB_REPOSITORY" >/dev/null || {
+            echo "::error::Upload the frozen Batch 25 environment archive and .sha256 to GitHub Release build-environment-batch25 before running this build."
+            exit 1
+          }
+      - name: Install host prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build zstd rsync libglib2.0-0 libpcre2-16-0 libdouble-conversion3 libssl3 libatomic1 libzstd1
+      - name: Download and verify frozen build environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download build-environment-batch25 --repo "$GITHUB_REPOSITORY" --pattern 'PCSX2_Batch25_Full_Build_Environment.tar.zst' --dir .
+          gh release download build-environment-batch25 --repo "$GITHUB_REPOSITORY" --pattern 'PCSX2_Batch25_Full_Build_Environment.tar.zst.sha256' --dir .
+          sha256sum -c PCSX2_Batch25_Full_Build_Environment.tar.zst.sha256
+      - name: Restore, compile and package
+        env:
+          BUILD_JOBS: '2'
+          SOURCE_MODE: ${{ inputs.source_mode }}
+        run: |
+          bash scripts/build-batch25-on-ubuntu.sh "$SOURCE_MODE" "$GITHUB_WORKSPACE/PCSX2_Batch25_Full_Build_Environment.tar.zst"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PCSX2-Developer-Windows-x64
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 90
