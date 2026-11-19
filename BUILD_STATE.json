@@ -1,0 +1,17 @@
+{
+  "project": "PCSX2 Developer Edition",
+  "checkpoint": "Batch 25",
+  "upstream_branch": "upstream-master",
+  "developer_branch": "developer",
+  "upstream_import_sha": "f0c84e93813ae3d5e9eefd0ac9edf1bbd86e315f",
+  "windows_binary": "pcsx2-qt.exe",
+  "windows_binary_linked": true,
+  "windows_runtime_tested": false,
+  "custom_source_committed": false,
+  "build_environment_release_uploaded": false,
+  "build_environment_archive": "PCSX2_Batch25_Full_Build_Environment.tar.zst",
+  "build_environment_size_bytes": 1271129235,
+  "build_environment_sha256": "36969a7ee186813a29c45bc3b4cdc8df2fe792f856ed86889bdf78365e13896f",
+  "source_zip_sha256": "54019687dc1ab14d9ec3d8d4f51f985c6b18dfc6d623cbd8ba5fde768fbdfb59",
+  "runtime_zip_sha256": "0bdbca8fa795f402a3a9b827919ef68211a8b5e8242917649f6b006051766211"
+}
